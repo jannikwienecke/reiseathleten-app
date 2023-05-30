@@ -96,7 +96,7 @@ async function seed() {
   const location = await prisma.location.create({
     data: {
       name: "Tenerife",
-      description: "My first location",
+      description: "Beautiful island in the Atlantic Ocean",
       image:
         "https://images.unsplash.com/photo-1611095772763-4b0b2b0d9b0f?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8dGVuZXJpZmV8ZW58MHx8MHx8&ixlib=rb-1.2.1&w=1000&q=80",
     },

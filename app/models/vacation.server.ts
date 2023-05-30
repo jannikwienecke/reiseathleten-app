@@ -6,17 +6,7 @@ export function getVacation({ userId }: { userId: User["id"] }) {
   return prisma.vacation.findFirst({
     where: { userId },
     include: {
-      // activities: {
-      //   include: {
-      //     // tags: true,
-      //     ActivityTag: {
-      //       include: {
-      //         tag: true,
-      //       },
-      //     },
-      //     ActivityBooking: true,
-      //   },
-      // },
+      location: true,
       VacationActivity: {
         include: {
           activity: {
@@ -31,7 +21,6 @@ export function getVacation({ userId }: { userId: User["id"] }) {
           },
         },
       },
-      location: true,
     },
   });
 }

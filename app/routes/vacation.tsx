@@ -26,6 +26,7 @@ import type { Activity, Tag, Vacation } from "@prisma/client";
 import invariant from "tiny-invariant";
 import { GeneralErrorBoundary } from "~/components/error-boundary";
 import { getVacation } from "~/models/vacation.server";
+import { prisma } from "~/db.server";
 // import { prisma } from "~/db.server";
 
 // const prisma = new PrismaClient();
@@ -164,7 +165,7 @@ export async function loader({ request }: DataFunctionArgs): Promise<{
         activities.map((activity) => ({
           ...activity,
           tags: activity.ActivityTag.map((tag) => tag.tag),
-          datetime: activity.ActivityBooking[0]?.date.toLocaleDateString(),
+          datetime: activity.ActivityBooking[0]?.date.toISOString(),
         })) ?? [],
     },
   };
@@ -183,6 +184,19 @@ export async function action({ request }: DataFunctionArgs) {
       resolve("foo");
     }, 1000);
   });
+
+  const date = new Date(datetime.toString());
+
+  const promisePrisma = prisma.activityBooking.create({
+    data: {
+      date: date,
+      activityId: activityId.toString(),
+    },
+  });
+
+  const longestPromise = Promise.race([newPromise3000, promisePrisma]);
+
+  await longestPromise;
 
   return {
     success: true,
@@ -262,8 +276,6 @@ export default function NotesRoute() {
           />
         ) : null}
 
-        <br />
-
         <ActivityList
           title={format(selectedDate, "dd.MM.yyyy")}
           activities={activitiesSelectedDay}
@@ -341,6 +353,8 @@ const CardItem = ({
   const isUnallocated = !activity.datetime;
   // date cannot be changed by the user
   const isFixed = activity.datetime && activity.fixedDate;
+  console.log("==activity", activity.datetime);
+
   return (
     <motion.div
       whileTap={{ scale: 0.95 }}
@@ -541,6 +555,8 @@ const ActivityContent = ({
 
     const datetime = inputRef.current?.value ?? "";
     const formData = new FormData();
+    console.log("===datetime", datetime);
+
     formData.append("datetime", datetime);
     formData.append("activityId", activity?.id ?? "");
 
@@ -563,6 +579,25 @@ const ActivityContent = ({
   }, [actionData?.success, activity, navigation.state]);
 
   const isSubmitting = navigation.state === "submitting";
+
+  const currentDate = new Date();
+  // format 2023-05-30T12:13
+  // local time - not iso!!!
+  const day =
+    currentDate.getDate() < 10
+      ? `0${currentDate.getDate()}`
+      : currentDate.getDate();
+
+  const month =
+    currentDate.getMonth() + 1 < 10
+      ? `0${currentDate.getMonth() + 1}`
+      : currentDate.getMonth() + 1;
+
+  console.log({ day });
+
+  const formattedDate = `${currentDate.getFullYear()}-${month}-${day}T${currentDate.getHours()}:${currentDate.getMinutes()}`;
+
+  console.log({ formattedDate });
 
   return (
     <>
@@ -596,7 +631,8 @@ const ActivityContent = ({
                   type="datetime-local"
                   className="block w-[75vw] rounded-md border border-gray-300 px-2 py-1 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   defaultValue={
-                    inputDefaultDate || new Date().toISOString().slice(0, 16)
+                    formattedDate
+                    // inputDefaultDate || new Date().toLocaleString().slice(0, 16)
                   }
                 />
               </div>
@@ -613,7 +649,8 @@ const ActivityContent = ({
                   type="datetime-local"
                   className="block w-[75vw] rounded-md border border-gray-300 px-2  py-1 text-center focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   defaultValue={
-                    inputDefaultDate || new Date().toISOString().slice(0, 16)
+                    inputDefaultDate ||
+                    new Date().toLocaleDateString().slice(0, 16)
                   }
                 />
               </div>

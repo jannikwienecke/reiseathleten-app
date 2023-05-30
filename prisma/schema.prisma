@@ -38,17 +38,6 @@ model Note {
   userId String
 }
 
-//typescript interfaces for the models
-// there are different locations (spain...)
-// user can have multiple vacations
-// a vacation can have one location
-// each vacation has a name, start and end date, description, and a list of activities
-// a activity can be assigned to multiple vacations
-// a acitivity has a date, which is only valid for the vacation it is assigned to
-// there is a table of tags (fitness | red, beeach | blue, ...)
-// each activity can have multiple tags and each tag can be assigned to multiple activities
-// 
-
 model ActivityBooking {
   id         String   @id @default(cuid())
   date       DateTime
