@@ -30,10 +30,6 @@ export const action = async ({ request }: ActionArgs) => {
     );
   }
 
-  if (email === "admin@admin.de") {
-    createUser("admin@admin.de", "admin");
-  }
-
   if (typeof password !== "string" || password.length === 0) {
     return json(
       { errors: { email: null, password: "Password is required" } },
