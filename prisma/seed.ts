@@ -6,11 +6,6 @@ const prisma = new PrismaClient();
 async function seed() {
   const email = "admin@admin.de";
 
-  // cleanup the existing database
-  await prisma.user.delete({ where: { email } }).catch(() => {
-    // no worries if it doesn't exist yet
-  });
-
   const hashedPassword = await bcrypt.hash("admin", 10);
 
   const user = await prisma.user.create({
