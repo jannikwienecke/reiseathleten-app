@@ -15,4 +15,5 @@ echo 1 > /proc/sys/vm/overcommit_memory
 
 npx prisma migrate deploy
 npx prisma db push
+npx prisma db seed
 npm run start
