@@ -16,6 +16,7 @@ model User {
 
   password Password?
   notes    Note[]
+  Vacation Vacation[]
 }
 
 model Password {
@@ -35,4 +36,79 @@ model Note {
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
+}
+
+//typescript interfaces for the models
+// there are different locations (spain...)
+// user can have multiple vacations
+// a vacation can have one location
+// each vacation has a name, start and end date, description, and a list of activities
+// a activity can be assigned to multiple vacations
+// a acitivity has a date, which is only valid for the vacation it is assigned to
+// there is a table of tags (fitness | red, beeach | blue, ...)
+// each activity can have multiple tags and each tag can be assigned to multiple activities
+// 
+
+model ActivityBooking {
+  id         String   @id @default(cuid())
+  date       DateTime
+  activity   Activity @relation(fields: [activityId], references: [id])
+  activityId String
+}
+
+model Tag {
+  id          String        @id @default(cuid())
+  name        String
+  description String?
+  color       String
+  activityId  String?
+  ActivityTag ActivityTag[]
+}
+
+model Location {
+  id          String     @id @default(cuid())
+  name        String
+  description String
+  image       String
+  vacations   Vacation[]
+}
+
+model Activity {
+  id               String             @id @default(cuid())
+  name             String
+  description      String?
+  image            String?
+  fixedDate        Boolean            @default(true)
+  ActivityBooking  ActivityBooking[]
+  ActivityTag      ActivityTag[]
+  VacationActivity VacationActivity[]
+}
+
+model Vacation {
+  id               String             @id @default(cuid())
+  name             String
+  description      String?
+  startDate        DateTime
+  endDate          DateTime
+  location         Location           @relation(fields: [locationId], references: [id])
+  locationId       String
+  user             User               @relation(fields: [userId], references: [id])
+  userId           String
+  VacationActivity VacationActivity[]
+}
+
+model ActivityTag {
+  id         String   @id @default(cuid())
+  activity   Activity @relation(fields: [activityId], references: [id])
+  activityId String
+  tag        Tag      @relation(fields: [tagId], references: [id])
+  tagId      String
+}
+
+model VacationActivity {
+  id         String   @id @default(cuid())
+  vacation   Vacation @relation(fields: [vacationId], references: [id])
+  vacationId String
+  activity   Activity @relation(fields: [activityId], references: [id])
+  activityId String
 }
