@@ -11,6 +11,8 @@ export const loader = async ({ request }: LoaderArgs) => {
   const userId = await getUserId(request);
   console.log({ userId });
 
+  // createUser("admin@admin.de", "admin");
+
   return json({});
 };
 
@@ -28,10 +30,6 @@ export const action = async ({ request }: ActionArgs) => {
       { errors: { email: "Email is invalid", password: null } },
       { status: 400 }
     );
-  }
-
-  if (email === "admin@admin.de") {
-    createUser("admin@admin.de", "admin");
   }
 
   if (typeof password !== "string" || password.length === 0) {
